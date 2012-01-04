@@ -1,0 +1,3 @@
+mvn clean -Dgae.home=../../.m2/repository/com/google/appengine/appengine-java-sdk/1.6.0/appengine-java-sdk-1.6.0 gae:run
+
+mvn clean -Dgae.home=../../.m2/repository/com/google/appengine/appengine-java-sdk/1.6.0/appengine-java-sdk-1.6.0 gae:deploy
