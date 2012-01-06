@@ -59,7 +59,16 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
 
         ekikara2OuDia = new Ekikara2OuDia();
         for (String url : urlArgs) {
-            ekikara2OuDia.process(url);
+            try {
+                ekikara2OuDia.process(url);
+            } catch (Exception e) {
+                log.error("lineNumber: " + lineNumber + ", processTables: "
+                   + processTables + ", day: " + day, e);
+                Response response =
+                   Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                   type(MediaType.TEXT_PLAIN).entity(e.toString()).build();
+                throw new WebApplicationException(response);
+            }
         }
         log.debug("title: {}\nupdateDate: {}", ekikara2OuDia.getTitle(),
                   ekikara2OuDia.getUpdateDate());
@@ -79,8 +88,10 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         } catch (UnsupportedEncodingException e) {
         } catch (IOException e) {
             log.error("lineNumber: " + lineNumber, e);
-            throw new WebApplicationException
-                (e, Response.Status.INTERNAL_SERVER_ERROR);
+            Response response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                type(MediaType.TEXT_PLAIN).entity(e.toString()).build();
+            throw new WebApplicationException(e, response);
         }
         log.trace("sjis contents: {}", new String(out.toByteArray()));
         return Response.ok(out.toByteArray(),
