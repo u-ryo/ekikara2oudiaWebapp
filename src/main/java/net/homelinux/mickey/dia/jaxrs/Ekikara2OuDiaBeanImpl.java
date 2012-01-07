@@ -45,8 +45,10 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
     @Override
     public Response getOuDia(String processTables, String lineNumber,
                              String startTime, String day, boolean reverse) {
-        log.info("url: {} {}", resources.getString(DEFAULT_URL_STRING) + lineNumber
-                 + resources.getString(DOWN_STRING) + day + EXT_STRING, processTables);
+        log.info("url: {} processTables: {}",
+                 resources.getString(DEFAULT_URL_STRING)
+                 + lineNumber + resources.getString(DOWN_STRING) + "1" + day
+                 + EXT_STRING, processTables);
         log.debug("processTables: {}\nlineNumber: {}\nstartTime: {}\nday: {}"
                   + "\nreverse: {}", new Object[] { processTables, lineNumber,
                                                     startTime, day, reverse });
@@ -69,7 +71,7 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                 Response response =
                     Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                     type(MediaType.TEXT_PLAIN).entity(e.toString()).build();
-                throw new WebApplicationException(response);
+                throw new WebApplicationException(e, response);
             }
         }
         log.debug("title: {}\nupdateDate: {}", ekikara2OuDia.getTitle(),
@@ -116,9 +118,9 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
             message = "曜日の指定が悪い.";
         }
         if (message != null) {
-            log.error("checkParams error!\nprocessTables: {}\nlineNumber: {}"
-                      + "\nstartTime: {}\nday: {}",
-                      new String[] { processTables, lineNumber,
+            log.error("checkParams error! {}\nprocessTables: {}\nlineNumber: "
+                      + "{}\nstartTime: {}\nday: {}",
+                      new String[] { message, processTables, lineNumber,
                                      startTime, day});
             Response response =
                 Response.status(Response.Status.BAD_REQUEST).
