@@ -17,6 +17,7 @@
   </static-files>
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+<!--     <property name="java.util.logging.config.file" value="WEB-INF/classes/log4j.properties"/> -->
     <property name="file.encoding" value="MS932"/>
   </system-properties>
 </appengine-web-app>
