@@ -45,6 +45,8 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
     @Override
     public Response getOuDia(String processTables, String lineNumber,
                              String startTime, String day, boolean reverse) {
+        log.info("url: {} {}", resources.getString(DEFAULT_URL_STRING) + lineNumber
+                 + resources.getString(DOWN_STRING) + day + EXT_STRING, processTables);
         log.debug("processTables: {}\nlineNumber: {}\nstartTime: {}\nday: {}"
                   + "\nreverse: {}", new Object[] { processTables, lineNumber,
                                                     startTime, day, reverse });
@@ -63,10 +65,10 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                 ekikara2OuDia.process(url);
             } catch (Exception e) {
                 log.error("lineNumber: " + lineNumber + ", processTables: "
-                   + processTables + ", day: " + day, e);
+                          + processTables + ", day: " + day, e);
                 Response response =
-                   Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-                   type(MediaType.TEXT_PLAIN).entity(e.toString()).build();
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                    type(MediaType.TEXT_PLAIN).entity(e.toString()).build();
                 throw new WebApplicationException(response);
             }
         }
