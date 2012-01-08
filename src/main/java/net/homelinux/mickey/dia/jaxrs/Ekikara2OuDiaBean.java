@@ -2,6 +2,7 @@ package net.homelinux.mickey.dia.jaxrs;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
@@ -16,5 +17,6 @@ public interface Ekikara2OuDiaBean {
                              @FormParam("lineNumber") String lineNumber,
                              @DefaultValue("0300") @FormParam("startTime") String startTime,
                              @DefaultValue("") @FormParam("day") String day,
-                             @FormParam("reverse") boolean reverse);
+                             @FormParam("reverse") boolean reverse,
+                             @HeaderParam("Referer") String referer);
 }

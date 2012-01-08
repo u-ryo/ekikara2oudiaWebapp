@@ -84,7 +84,14 @@
     <dependency>
       <groupId>net.homelinux.mickey.dia</groupId>
       <artifactId>ekikara2oudia</artifactId>
-      <version>1.2.3</version>
+      <version>[1,)</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>[2,)</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

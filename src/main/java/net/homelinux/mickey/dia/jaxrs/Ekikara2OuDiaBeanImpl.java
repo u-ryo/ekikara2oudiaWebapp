@@ -44,11 +44,13 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
 
     @Override
     public Response getOuDia(String processTables, String lineNumber,
-                             String startTime, String day, boolean reverse) {
-        log.info("url: {} processTables: {}",
-                 resources.getString(DEFAULT_URL_STRING)
-                 + lineNumber + resources.getString(DOWN_STRING) + "1" + day
-                 + EXT_STRING, processTables);
+                             String startTime, String day, boolean reverse,
+                             String referer) {
+        log.info("url: {} processTables: {}\nreferer: {}",
+                 new String[] {
+                     resources.getString(DEFAULT_URL_STRING) + lineNumber
+                     + resources.getString(DOWN_STRING) + "1" + day
+                     + EXT_STRING, processTables, referer });
         log.debug("processTables: {}\nlineNumber: {}\nstartTime: {}\nday: {}"
                   + "\nreverse: {}", new Object[] { processTables, lineNumber,
                                                     startTime, day, reverse });
