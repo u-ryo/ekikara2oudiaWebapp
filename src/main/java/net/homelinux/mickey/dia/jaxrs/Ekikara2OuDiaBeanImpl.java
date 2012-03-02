@@ -18,6 +18,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.apphosting.api.DeadlineExceededException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +69,17 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         for (String url : urlArgs) {
             try {
                 ekikara2OuDia.process(url);
+            } catch (DeadlineExceededException e) {
+                log.error("lineNumber: " + lineNumber + ", processTables: "
+                          + processTables + ", day: " + day, e);
+                String message
+                    = "実行時間が60秒を超えた。Engine内部のWeb cacheが効いて"
+                    + "いるうちに、F5やCtrl-R等でもう一回repostしてみるべし。"
+                    + "2〜3回やってもダメなら、mailで相談されたい。";
+                Response response =
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                    type(MediaType.TEXT_PLAIN).entity(message).build();
+                throw new WebApplicationException(e, response);
             } catch (Exception e) {
                 log.error("lineNumber: " + lineNumber + ", processTables: "
                           + processTables + ", day: " + day, e);
