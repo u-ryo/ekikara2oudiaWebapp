@@ -89,7 +89,6 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                 throw new WebApplicationException(e, response);
             }
         }
-        ekikara2OuDia.clientShutdown();
         log.info("title: {}\nupdateDate: {}", ekikara2OuDia.getTitle(),
                  ekikara2OuDia.getUpdateDate());
         Formatter formatter =
