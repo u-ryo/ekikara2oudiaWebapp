@@ -80,6 +80,16 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                     Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                     type(MediaType.TEXT_PLAIN).entity(message).build();
                 throw new WebApplicationException(e, response);
+            } catch (IndexOutOfBoundsException e) {
+                log.error("lineNumber: " + lineNumber + ", processTables: "
+                          + processTables + ", day: " + day, e);
+                String message
+                    = "多分「処理する表」の指定が範囲外、"
+                    + "そうでなければinternalなerror(not yet resolved)。" + e;
+                Response response =
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                    type(MediaType.TEXT_PLAIN).entity(message).build();
+                throw new WebApplicationException(e, response);
             } catch (Exception e) {
                 log.error("lineNumber: " + lineNumber + ", processTables: "
                           + processTables + ", day: " + day, e);
