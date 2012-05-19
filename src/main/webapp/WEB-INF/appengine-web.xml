@@ -15,6 +15,7 @@
     <include path="/*.bz2"/>
     <include path="/favicon.ico"/>
   </static-files>
+  <threadsafe>true</threadsafe>
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
 <!--     <property name="java.util.logging.config.file" value="WEB-INF/classes/log4j.properties"/> -->
