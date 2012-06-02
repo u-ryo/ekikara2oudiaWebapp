@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blacklistentries>
+  <blacklist>
+    <subnet>14.132.0.0/24</subnet>
+    <description>commufa.jp 14.132.0.0</description>
+  </blacklist>
+  <blacklist>
+    <subnet>115.36.0.0/14</subnet>
+    <description>commufa.jp 115.36.0.0-115.39.0.0</description>
+  </blacklist>
+  <blacklist>
+    <subnet>118.104.0.0/14</subnet>
+    <description>commufa.jp 118.104.0.0-118.106.0.0</description>
+  </blacklist>
+  <blacklist>
+    <subnet>123.1.0.0/24</subnet>
+    <description>commufa.jp 123.1.0.0</description>
+  </blacklist>
+  <blacklist>
+    <subnet>123.48.0.0/24</subnet>
+    <description>commufa.jp 123.48.0.0</description>
+  </blacklist>
+  <blacklist>
+    <subnet>124.18.0.0/24</subnet>
+    <description>commufa.jp 124.18.0.0</description>
+  </blacklist>
+  <blacklist>
+    <subnet>180.196.0.0/14</subnet>
+    <description>commufa.jp 180.198.0.0-180.199.0.0</description>
+  </blacklist>
+</blacklistentries>

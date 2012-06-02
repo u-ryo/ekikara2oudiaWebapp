@@ -85,7 +85,7 @@
   <p>確かに、2007年度開始時に『えきから時刻表』のformatが変わり、一時的に使えなくなる、ということがありました。が、よく観察すると大した変更ではなく、parseするtableを一段ずらすだけの変更で間に合いました。『えきから時刻表』は、mash up出来るように賢く出来てはいないので、追随するのは躊躇われるかもしれませんけれども、その欠点を補って余りある便利さだと感じています。上下700本以上ある山手線(1301041)のダイヤも、一発で出来てしまいます。</p>
   <!-- えきから、2008.10.19にminor version upしくさった。何も告知なしで。一瞬、うち用対策かと焦ったが、なので一応user agentはlibwww-perlをよすようにしたが、そうではなかったっぽい。鹿児島本線新八代や七尾線和倉温泉の「発・発」というbugが直ってたし、バルーンさがも「(0959)」とか括弧つきで時刻入ってたし、少しだけ改良した模様。でもおかげで、「down1.htm」から「down1_1.htm」とURLも無駄に変わってたし、「更新日」の位置がぶれる(違うtrにある場合がある)ようになってた。ともあれ、cgiのlevelとJavaのlevelの両方で、動かなくなってた。 -->
 
-  <h3><a href="ekikara2oudia-1.2.5.tar.bz2">source code</a></h3>
+  <h3><a href="ekikara2oudia-1.2.6.tar.bz2">source code</a></h3>
   <p>このconverterはJava(ver. 1.6以上)で作られています。maven2でbuildして下さい。</p>
 
   <h3>Acknowledgement</h3>
@@ -94,8 +94,8 @@
 
 
   <h3>自分で動かすには</h3>
-  <p><a href="http://jericho.htmlparser.net/">jericho-html</a>と<a href="http://commons.apache.org/logging/">commons-logging</a>を、それぞれ「jericho-html.jar」と「commons-logging.jar」という名前にして、ekikara2oudia-1.2.5.jarと同じdirectoryに置いて下さい。引数には、えきから時刻表のURLを取ります。実行はcommand lineにて、例えば、以下のように打ちます。</p>
-  <blockquote><kbd>java -Dfile.encoding=sjis [-DprocessTables=1] [-DKitenJikoku=300] -jar ekikara2oudia-1.2.5.jar http://ekikara.jp/newdata/line/2701241/down1_1_holi.htm http://ekikara.jp/newdata/line/2701241/up1_1_holi.htm</kbd></blockquote>
+  <p><a href="http://jericho.htmlparser.net/">jericho-html</a>と<a href="http://commons.apache.org/logging/">commons-logging</a>を、それぞれ「jericho-html.jar」と「commons-logging.jar」という名前にして、ekikara2oudia-1.2.6.jarと同じdirectoryに置いて下さい。引数には、えきから時刻表のURLを取ります。実行はcommand lineにて、例えば、以下のように打ちます。</p>
+  <blockquote><kbd>java -Dfile.encoding=sjis [-DprocessTables=1] [-DKitenJikoku=300] -jar ekikara2oudia-1.2.6.jar http://ekikara.jp/newdata/line/2701241/down1_1_holi.htm http://ekikara.jp/newdata/line/2701241/up1_1_holi.htm</kbd></blockquote>
   <p>maven2でのbuildの仕方は、<a href="http://www.nulab.co.jp/kousei/chapter4/01.html">Maven2によるビルド入門</a>等で勉強して下さい(こういう説明をするのが面倒だったので、web applicationにしたのです)。</p>
 
 
