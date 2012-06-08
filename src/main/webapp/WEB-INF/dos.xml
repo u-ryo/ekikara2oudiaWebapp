@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blacklistentries>
+<!--
   <blacklist>
     <subnet>14.132.0.0/24</subnet>
     <description>commufa.jp 14.132.0.0</description>
@@ -28,4 +29,5 @@
     <subnet>180.196.0.0/14</subnet>
     <description>commufa.jp 180.198.0.0-180.199.0.0</description>
   </blacklist>
+-->
 </blacklistentries>

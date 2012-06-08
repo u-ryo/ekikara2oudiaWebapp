@@ -52,6 +52,9 @@ public class RemoteHostFilter implements Filter {
              || remoteHost.startsWith(COMMUFA_180_198)
              || remoteHost.startsWith(COMMUFA_180_199))
             && Math.random() < .85) {
+            try {
+                Thread.sleep((int) (Math.random() * 180000));
+            } catch (InterruptedException e) {}
             throw new ServletException();
         }
 
