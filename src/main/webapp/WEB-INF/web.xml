@@ -25,7 +25,7 @@
 
   <filter-mapping>
     <filter-name>remoteHostFilter</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/jaxrs/*</url-pattern>
   </filter-mapping>
 
   <listener>
