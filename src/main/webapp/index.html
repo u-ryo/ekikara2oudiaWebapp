@@ -47,13 +47,15 @@
   <!-- h3>2011.10.17のえきから時刻表の突然の変更に対応</h3 -->
   <!-- p>何か、えきから時刻表のtable構成が突如変わったようですね10/17に何の予告もなく。まぁ、勝手にparseしてるだけなので文句は言えませんが。例によって、programはparseするtableの段を適当にずらすだけで行けましたけど。</p --><!-- p>たださぁ、動かなくなっちゃったの見付けたなら、便所の落書きやmixiのコミュニティトピなんかに書き込むんじゃなくって、mailで作者に言えよなぁおまいら、という感じです。作者だって、毎日こんなの使ってるわけではないのです。</p -->
 
+  <p>初めて直接要望がありました。取り敢えず、まず「1.02」にしました(2/9/2014)。「列車種別の変換を抑制するオプション」は、難しいです。というのも、「列車種別」は任意文字列ではなく、dia fileの冒頭で全種類列挙しておく必要があるからです。「快速急行」の他、変換して欲しい列車種別を挙げて下さい(私鉄には列車種別が多すぎて、私が調査する気にはなりません)。もしくは、任意文字列を書けるような仕様にするようOuDiaの作者に働きかけて下さい(dia fileが大幅に変わってしまいそうですが)。それからついでに、「鹿児島本線で運転日注意の休日運休列車も変換されてしまう」のは、具体的にはよくわかりませんが、そもそもえきから時刻表の休日ページに休日運休列車が掲載されている方がおかしいんじゃないんですか?(2/23/2014)</p>
+
   <h3>これは何?</h3>
   <p>『<a href="http://ekikara.jp/">えきから時刻表</a>』のdataを、<a href="http://homepage2.nifty.com/take-okm/oudia/">OuDia</a>形式のfileに変換するJava programとその<!-- cgi wrapper -->jaxrs programです。</p>
 
   <h3>「線区番号」って?</h3>
   <p>
-   『えきから時刻表』である線区の時刻表を表示させ、そのURLを見て下さい。例えば、岩泉線だと、
-   <blockquote>http://ekikara.jp/newdata/line/<span class="line_number">1301451</span>/down1_1.htm</blockquote>
+   『えきから時刻表』である線区の時刻表を表示させ、そのURLを見て下さい。例えば、山田線だと、
+   <blockquote>http://ekikara.jp/newdata/line/<span class="line_number">1301691</span>/down1_1.htm</blockquote>
    となります。
   </p>
 
@@ -85,8 +87,8 @@
   <p>確かに、2007年度開始時に『えきから時刻表』のformatが変わり、一時的に使えなくなる、ということがありました。が、よく観察すると大した変更ではなく、parseするtableを一段ずらすだけの変更で間に合いました。『えきから時刻表』は、mash up出来るように賢く出来てはいないので、追随するのは躊躇われるかもしれませんけれども、その欠点を補って余りある便利さだと感じています。上下700本以上ある山手線(1301041)のダイヤも、一発で出来てしまいます。</p>
   <!-- えきから、2008.10.19にminor version upしくさった。何も告知なしで。一瞬、うち用対策かと焦ったが、なので一応user agentはlibwww-perlをよすようにしたが、そうではなかったっぽい。鹿児島本線新八代や七尾線和倉温泉の「発・発」というbugが直ってたし、バルーンさがも「(0959)」とか括弧つきで時刻入ってたし、少しだけ改良した模様。でもおかげで、「down1.htm」から「down1_1.htm」とURLも無駄に変わってたし、「更新日」の位置がぶれる(違うtrにある場合がある)ようになってた。ともあれ、cgiのlevelとJavaのlevelの両方で、動かなくなってた。 -->
 
-  <h3><a href="ekikara2oudia-1.2.6.tar.bz2">source code</a></h3>
-  <p>このconverterはJava(ver. 1.6以上)で作られています。maven2でbuildして下さい。</p>
+  <h3><a href="http://walt.dix.asia/~u-ryo/java/ekikara2oud/ekikara2oudia-1.2.8.tar.bz2">source code</a></h3>
+  <p>このconverterはJava(ver. 1.7以上)で作られています。maven2でbuildして下さい。</p>
 
   <h3>Acknowledgement</h3>
   <p>OuDiaという便利なsoftwareを作って下さったtake-okm氏に感謝します。</p>
@@ -94,14 +96,14 @@
 
 
   <h3>自分で動かすには</h3>
-  <p><a href="http://jericho.htmlparser.net/">jericho-html</a>と<a href="http://commons.apache.org/logging/">commons-logging</a>を、それぞれ「jericho-html.jar」と「commons-logging.jar」という名前にして、ekikara2oudia-1.2.6.jarと同じdirectoryに置いて下さい。引数には、えきから時刻表のURLを取ります。実行はcommand lineにて、例えば、以下のように打ちます。</p>
-  <blockquote><kbd>java -Dfile.encoding=sjis [-DprocessTables=1] [-DKitenJikoku=300] -jar ekikara2oudia-1.2.6.jar http://ekikara.jp/newdata/line/2701241/down1_1_holi.htm http://ekikara.jp/newdata/line/2701241/up1_1_holi.htm</kbd></blockquote>
+  <p><a href="http://jericho.htmlparser.net/">jericho-html</a>と<a href="http://commons.apache.org/logging/">commons-logging</a>を、それぞれ「jericho-html.jar」と「commons-logging.jar」という名前にして、ekikara2oudia-1.2.8.jarと同じdirectoryに置いて下さい。引数には、えきから時刻表のURLを取ります。実行はcommand lineにて、例えば、以下のように打ちます。</p>
+  <blockquote><kbd>java -Dfile.encoding=sjis [-DprocessTables=1] [-DKitenJikoku=300] -jar ekikara2oudia-1.2.8.jar http://ekikara.jp/newdata/line/2701241/down1_1_holi.htm http://ekikara.jp/newdata/line/2701241/up1_1_holi.htm</kbd></blockquote>
   <p>maven2でのbuildの仕方は、<a href="http://www.nulab.co.jp/kousei/chapter4/01.html">Maven2によるビルド入門</a>等で勉強して下さい(こういう説明をするのが面倒だったので、web applicationにしたのです)。</p>
 
 
   <hr/>
-  <address><a href="mailto:u-ryo＠mickey.homelinux.net">Ryo UMETSU</a>(since 2008.2.8)</address>
-  <!-- hhmts start -->Last modified: Tue Jan 10 00:20:50 JST 2012 <!-- hhmts end -->
+  <address><a href="mailto:u-ryo＠walt.dix.asia">Ryo UMETSU</a>(since 2008.2.8)</address>
+  <!-- hhmts start -->Last modified: Thu Feb 14 00:03:48 JST 2014 <!-- hhmts end -->
 
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

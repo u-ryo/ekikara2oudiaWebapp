@@ -9,7 +9,7 @@
   <url>http://ekikara2oudia.appspot.com/</url>
   <properties>
     <lib.dir></lib.dir>
-    <gae.version>[1,)</gae.version>
+    <gae.version>1.8.9</gae.version>
     <cxf.version>[2,)</cxf.version>
     <slf4j.version>[1,)</slf4j.version>
   </properties>
@@ -57,24 +57,24 @@
 <!--       <artifactId>appengine-java-sdk</artifactId> -->
 <!--       <version>${gae.version}</version> -->
 <!--     </dependency> -->
-    <dependency>
-      <groupId>com.google.appengine</groupId>
-      <artifactId>appengine-api-labs</artifactId>
-      <version>${gae.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.appengine</groupId>
-      <artifactId>appengine-api-stubs</artifactId>
-      <version>${gae.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.appengine</groupId>
-      <artifactId>appengine-testing</artifactId>
-      <version>${gae.version}</version>
-      <scope>test</scope>
-    </dependency>
+    <!-- <dependency> -->
+    <!--   <groupId>com.google.appengine</groupId> -->
+    <!--   <artifactId>appengine-api-labs</artifactId> -->
+    <!--   <version>${gae.version}</version> -->
+    <!--   <scope>compile</scope> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.google.appengine</groupId> -->
+    <!--   <artifactId>appengine-api-stubs</artifactId> -->
+    <!--   <version>${gae.version}</version> -->
+    <!--   <scope>test</scope> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.google.appengine</groupId> -->
+    <!--   <artifactId>appengine-testing</artifactId> -->
+    <!--   <version>${gae.version}</version> -->
+    <!--   <scope>test</scope> -->
+    <!-- </dependency> -->
 
     <dependency>
       <groupId>net.htmlparser.jericho</groupId>
