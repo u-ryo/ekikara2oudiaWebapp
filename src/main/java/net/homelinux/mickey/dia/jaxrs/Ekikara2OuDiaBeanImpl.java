@@ -1,5 +1,7 @@
 package net.homelinux.mickey.dia.jaxrs;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
@@ -7,10 +9,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +23,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.appengine.api.ThreadManager;
+import com.google.apphosting.api.ApiProxy;
 import com.google.apphosting.api.DeadlineExceededException;
+
+import net.htmlparser.jericho.Source;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +58,12 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                              String startTime, String day, boolean reverse,
                              String referer) {
         log.info("url: {} processTables: {}\nreferer: {}",
-                 new String[] {
-                     resources.getString(DEFAULT_URL_STRING) + lineNumber
-                     + resources.getString(DOWN_STRING) + "1" + day
-                     + EXT_STRING, processTables, referer });
+                 resources.getString(DEFAULT_URL_STRING) + lineNumber
+                 + resources.getString(DOWN_STRING) + "1" + day
+                 + EXT_STRING, processTables, referer);
         log.debug("processTables: {}\nlineNumber: {}\nstartTime: {}\nday: {}"
-                  + "\nreverse: {}", new Object[] { processTables, lineNumber,
-                                                    startTime, day, reverse });
+                  + "\nreverse: {}", processTables, lineNumber, startTime, day,
+                  reverse);
         checkParams(processTables, lineNumber, startTime, day);
 
         System.setProperty(PROCESS_TABLES_STRING, processTables);
@@ -66,38 +74,25 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         log.debug("urlArgs: {}", urlArgs);
 
         ekikara2OuDia = new Ekikara2OuDia();
-        for (String url : urlArgs) {
-            try {
-                ekikara2OuDia.process(url);
-            } catch (DeadlineExceededException e) {
-                log.error("lineNumber: " + lineNumber + ", processTables: "
-                          + processTables + ", day: " + day, e);
-                String message
-                    = "実行時間が60秒を超えた。Engine内部のWeb cacheが効いて"
-                    + "いるうちに、F5やCtrl-R等でもう一回repostしてみるべし。"
-                    + "2〜3回やってもダメなら、mailで相談されたい。";
-                Response response =
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-                    type(MediaType.TEXT_PLAIN).entity(message).build();
-                throw new WebApplicationException(e, response);
-            } catch (IndexOutOfBoundsException e) {
-                log.error("lineNumber: " + lineNumber + ", processTables: "
-                          + processTables + ", day: " + day, e);
-                String message
-                    = "多分「処理する表」の指定が範囲外、"
-                    + "そうでなければinternalなerror(not yet resolved)。" + e;
-                Response response =
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-                    type(MediaType.TEXT_PLAIN).entity(message).build();
-                throw new WebApplicationException(e, response);
-            } catch (Exception e) {
-                log.error("lineNumber: " + lineNumber + ", processTables: "
-                          + processTables + ", day: " + day, e);
-                Response response =
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-                    type(MediaType.TEXT_PLAIN).entity(e.toString()).build();
-                throw new WebApplicationException(e, response);
-            }
+        final List<Source> sources = new ArrayList<>();
+        ExecutorService pool = Executors.newFixedThreadPool
+            (40, ThreadManager.currentRequestThreadFactory());
+        for (final String url : urlArgs) {
+            pool.execute(new Runnable() {
+                    public void run() {
+                        runProcess(sources, ekikara2OuDia, url);
+                // ekikara2OuDia.process(url);
+                    }
+                });
+        }
+        pool.shutdown();
+        try {
+            pool.awaitTermination(3600, SECONDS);
+        } catch (InterruptedException e) {
+            log.error("interrupted exception", e);
+        }
+        for (Source source : sources) {
+            ekikara2OuDia.process(source);
         }
         log.info("title: {}\nupdateDate: {}", ekikara2OuDia.getTitle(),
                  ekikara2OuDia.getUpdateDate());
@@ -127,6 +122,11 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                            MediaType.APPLICATION_OCTET_STREAM)
             .header("Content-disposition", "attachment; filename="
                     + lineNumber + day + ".oud")
+            .header("Access-Control-Allow-Origin", "http://ekikara.jp")
+            .header("Access-Control-Allow-Headers",
+                    "origin, content-type, accept, authorization")
+            .header("Access-Control-Allow-Credentials", "true")
+            .header("Access-Control-Allow-Methods", "POST")
             .build();
     }
 
@@ -145,12 +145,43 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         if (message != null) {
             log.error("checkParams error! {}\nprocessTables: {}\nlineNumber: "
                       + "{}\nstartTime: {}\nday: {}",
-                      new String[] { message, processTables, lineNumber,
-                                     startTime, day});
+                      message, processTables, lineNumber, startTime, day);
             Response response =
                 Response.status(Response.Status.BAD_REQUEST).
                 type(MediaType.TEXT_PLAIN).entity(message).build();
             throw new WebApplicationException(response);
+        }
+    }
+
+    private void runProcess(List<Source> sources, Ekikara2OuDia ekikara2OuDia,
+                            String url) {
+        try {
+            sources.add(ekikara2OuDia.fetchUrlAndParse(url));
+        } catch (DeadlineExceededException e) {
+            log.error("url: " + url, e);
+            String message
+                = "実行時間が60秒を超えた。Engine内部のWeb cacheが効いて"
+                + "いるうちに、F5やCtrl-R等でもう一回repostしてみるべし。"
+                + "2〜3回やってもダメなら、mailで相談されたい。";
+            Response response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                type(MediaType.TEXT_PLAIN).entity(message).build();
+            throw new WebApplicationException(e, response);
+        } catch (IndexOutOfBoundsException e) {
+            log.error("url: " + url, e);
+            String message
+                = "多分「処理する表」の指定が範囲外、"
+                + "そうでなければinternalなerror(not yet resolved)。" + e;
+            Response response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                type(MediaType.TEXT_PLAIN).entity(message).build();
+            throw new WebApplicationException(e, response);
+        } catch (Exception e) {
+            log.error("url: " + url, e);
+            Response response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                type(MediaType.TEXT_PLAIN).entity(e.toString()).build();
+            throw new WebApplicationException(e, response);
         }
     }
 
@@ -186,11 +217,18 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                 type(MediaType.TEXT_PLAIN).
                 entity("server側のIO error.").build();
             throw new WebApplicationException(e, response);
+        } catch (ApiProxy.OverQuotaException e) {
+            log.error("defaultURL: " + defaultURL, e);
+            Response response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                type(MediaType.TEXT_PLAIN).
+                entity("fetch URLでGAEのQuotaを超えた。").build();
+            throw new WebApplicationException(e, response);
         }
 
         if (pages == 0) {
             log.error("page is 0. lineNumber: {}, direction: {}, day: {}",
-                      new String[] { lineNumber, direction, day });
+                      lineNumber, direction, day);
             Response response =
                 Response.status(Response.Status.BAD_REQUEST).
                 type(MediaType.TEXT_PLAIN).

@@ -13,9 +13,11 @@ public interface Ekikara2OuDiaBean {
     @POST
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Path("/getOuDia")
-    public Response getOuDia(@DefaultValue("1") @FormParam("processTables") String processTables,
+    public Response getOuDia(@DefaultValue("1")
+                             @FormParam("processTables") String processTables,
                              @FormParam("lineNumber") String lineNumber,
-                             @DefaultValue("0300") @FormParam("startTime") String startTime,
+                             @DefaultValue("0300")
+                             @FormParam("startTime") String startTime,
                              @DefaultValue("") @FormParam("day") String day,
                              @FormParam("reverse") boolean reverse,
                              @HeaderParam("Referer") String referer);

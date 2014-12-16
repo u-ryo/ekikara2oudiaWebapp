@@ -1,5 +1,9 @@
-mvn clean -Dgae.home=../../.m2/repository/com/google/appengine/appengine-java-sdk/1.6.0/appengine-java-sdk-1.6.0 gae:run
+#mvn clean -Dgae.home=/home/u-ryo/.m2/repository/com/google/appengine/appengine-java-sdk/1.9.17/appengine-java-sdk-1.9.17 gae:run
 
-mvn clean -Dgae.home=../../.m2/repository/com/google/appengine/appengine-java-sdk/1.6.0/appengine-java-sdk-1.6.0 gae:deploy
+#mvn clean -Dgae.home=/home/u-ryo/.m2/repository/com/google/appengine/appengine-java-sdk/1.9.17/appengine-java-sdk-1.9.17 gae:deploy
 
-JAVA_HOME=/home/u-ryo/jdk1.6.0_17 mvn clean -Dgae.home=../../src/appengine-java-sdk-1.6.5 gae:deploy
+#JAVA_HOME=/home/u-ryo/jdk1.6.0_17 mvn clean -Dgae.home=../../src/appengine-java-sdk-1.6.5 gae:deploy
+
+https://code.google.com/p/appengine-maven-plugin/
+mvn clean appengine:devserver
+JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64 mvn clean appengine:update

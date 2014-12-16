@@ -4,14 +4,13 @@
   <groupId>net.homelinux.mickey.dia.jaxrs</groupId>
   <artifactId>ekikara2oudia</artifactId>
   <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>Ekikara2OuDia WebApp</name>
   <url>http://ekikara2oudia.appspot.com/</url>
   <properties>
-    <lib.dir></lib.dir>
-    <gae.version>1.8.9</gae.version>
+    <gae.version>1.9.17</gae.version>
     <cxf.version>[2,)</cxf.version>
-    <slf4j.version>[1,)</slf4j.version>
+    <slf4j.version>[1.7,)</slf4j.version>
   </properties>
   <dependencies>
     <dependency>
@@ -41,22 +40,22 @@
       <artifactId>slf4j-jdk14</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>[1,)</version>
-    </dependency>
+    <!-- <dependency> -->
+    <!--   <groupId>log4j</groupId> -->
+    <!--   <artifactId>log4j</artifactId> -->
+    <!--   <version>[1,)</version> -->
+    <!-- </dependency> -->
 
     <dependency>
       <groupId>com.google.appengine</groupId>
       <artifactId>appengine-api-1.0-sdk</artifactId>
       <version>${gae.version}</version>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>com.google.appengine</groupId> -->
-<!--       <artifactId>appengine-java-sdk</artifactId> -->
-<!--       <version>${gae.version}</version> -->
-<!--     </dependency> -->
+    <!-- <dependency> -->
+    <!--   <groupId>com.google.appengine</groupId> -->
+    <!--   <artifactId>appengine-java-sdk</artifactId> -->
+    <!--   <version>${gae.version}</version> -->
+    <!-- </dependency> -->
     <!-- <dependency> -->
     <!--   <groupId>com.google.appengine</groupId> -->
     <!--   <artifactId>appengine-api-labs</artifactId> -->
@@ -105,36 +104,40 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.2</version>
         <configuration>
           <encoding>utf-8</encoding>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
       <plugin>
-        <groupId>net.kindleit</groupId>
-        <artifactId>maven-gae-plugin</artifactId>
-        <version>0.9.2</version>
+        <groupId>com.google.appengine</groupId>
+        <artifactId>appengine-maven-plugin</artifactId>
+        <version>${gae.version}</version>
+        <!-- <groupId>net.kindleit</groupId> -->
+        <!-- <artifactId>maven-gae-plugin</artifactId> -->
+        <!-- <version>0.9.2</version> -->
         <configuration>
           <port>8181</port>
           <address>127.0.0.1</address>
         </configuration>
-        <executions>
-          <execution>
-            <id>start-gae</id>
-            <goals>
-              <goal>stop</goal>
-              <goal>unpack</goal>
-              <goal>start</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>stop-gae</id>
-            <goals>
-              <goal>stop</goal>
-            </goals>
-          </execution>
-        </executions>
+        <!-- <executions> -->
+        <!--   <execution> -->
+        <!--     <id>start-gae</id> -->
+        <!--     <goals> -->
+        <!--       <goal>stop</goal> -->
+        <!--       <goal>unpack</goal> -->
+        <!--       <goal>start</goal> -->
+        <!--     </goals> -->
+        <!--   </execution> -->
+        <!--   <execution> -->
+        <!--     <id>stop-gae</id> -->
+        <!--     <goals> -->
+        <!--       <goal>stop</goal> -->
+        <!--     </goals> -->
+        <!--   </execution> -->
+        <!-- </executions> -->
       </plugin>
     </plugins>
   </build>

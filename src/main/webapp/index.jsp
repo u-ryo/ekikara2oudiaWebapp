@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=utf-8"%>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
@@ -10,6 +11,7 @@
    .line_number { color:red; }
    .important { color:red; font-style:italic; }
    .underline { text-decoration: underline; }
+   .textfield { width:60px; }
   </style>
  </head>
 
@@ -17,20 +19,35 @@
   <h1>えきから to OuDia</h1>
 
     <form action="jaxrs/ekikara2oudia/getOuDia" method="post">
-      線区番号: <input type="text" name="lineNumber" maxlength="7">
+      線区番号: <input class="textfield" type="text" name="lineNumber" maxlength="7" value='<%=request.getParameter("lineNumber") == null ? "" : request.getParameter("lineNumber")%>'>
       曜日: <select name="day">
         <option value="">平日</option>
         <option value="_sat">土曜</option>
         <option value="_holi">日祝</option>
       </select>
-      処理する表の指定: <input type="text" name="processTables" value="1">
+      処理する表の指定: <input class="textfield" type="text" name="processTables" value="1">
       reverse?: <input type="checkbox" name="reverse" value="true">
-      起点時刻: <input type="text" name="startTime" maxlength="4" value="0300">
+      起点時刻: <input class="textfield" type="text" name="startTime" maxlength="4" value="0300">
       <input type="submit">
     </form>
 
-  <p><a href="http://mickey.homelinux.net/~u-ryo/java/ekikara2oud/index.html">旧版</a>を用意しました。もしどうしてもうまく動かない場合には、旧版を使って下さい。<!-- 但し、2012年4月下旬に一旦止まる予定です。--></p>
+  <p>
+    京急本線のような大規模な路線については、60秒のtimeout制限を越えてしまうことがあるようです。失敗した後、30秒以内に同じ条件で再試行すれば、cacheが効いて成功するようです。(2014.12.16) → multithread化しました。少しは改善したようです。(2014.12.16)
+  </p>
+  <p>
+    要望を受け、「(料金不要)」を除去し京急快特等を認識するようにしました。(2014.12.14)
+  </p>
+  <p>
+    旧版は廃止しました。(2014)
+    <!-- <a href="http://mickey.homelinux.net/~u-ryo/java/ekikara2oud/index.html">旧版</a>を用意しました。もしどうしてもうまく動かない場合には、旧版を使って下さい。 -->
+    <!-- 但し、2012年4月下旬に一旦止まる予定です。-->
+  </p>
   <p>GAEでは、毎日JSTで16:00にquota resetされます。</p>
+  <p>Bookmarklet:
+    <a id="result_anchor" href="javascript:(function(){var lineNumber=location.href.replace(/http:\/\/ekikara.jp\/newdata\/[a-z]+\/(\d+)[/.].*/,'$1');if(isNaN(lineNumber)){alert('Here is not ekikara.jp.');}else{location.href='https://ekikara2oudia.appspot.com/?lineNumber='+lineNumber;}})();">Go to Ekikara2OuDia</a>
+    <!-- <a id="result_anchor" href="javascript:(function(){var lineNumber=location.href.replace(/http:\/\/ekikara.jp\/newdata\/[a-z]+\/(\d+)[/.].*/,'$1');if(isNaN(lineNumber)){alert('Here is not ekikara.jp.');return;}var args='lineNumber='+lineNumber+'&day=&processTables=1&startTime=0400';var xmlHttpRequest=new XMLHttpRequest();xmlHttpRequest.onreadystatechange=function(){var READYSTATE_COMPLETED=4;var HTTP_STATUS_OK=200;if(this.readyState==READYSTATE_COMPLETED&&this.status==HTTP_STATUS_OK){location.href='data:application/octet-stream,'+encodeURIComponent(this.responseText);}};xmlHttpRequest.open('POST','https://ekikara2oudia.appspot.com/jaxrs/ekikara2oudia/getOuDia');xmlHttpRequest.setRequestHeader('Content-Type','application/x-www-form-urlencoded');xmlHttpRequest.send(args);})();">Create OuDia Weekday</a> -->
+    (えきから時刻表の「線区番号」が出ているページ、即ち「路線時刻表」「路線沿線(駅名)」「列車詳細」で有効です。今どきUTF-8でなくShift-JISでattachement fileをajaxから落とすのが難しいのと、どうせparameter調整が必要だろうということで、単に遷移するだけにしました)
+  </p>
   <!-- p>列車番号がない! 神戸電鉄等に対応してみました。(2012.1.10)</p -->
 
   <!-- h3>IEで文字化けする場合</h3 -->
@@ -47,7 +64,7 @@
   <!-- h3>2011.10.17のえきから時刻表の突然の変更に対応</h3 -->
   <!-- p>何か、えきから時刻表のtable構成が突如変わったようですね10/17に何の予告もなく。まぁ、勝手にparseしてるだけなので文句は言えませんが。例によって、programはparseするtableの段を適当にずらすだけで行けましたけど。</p --><!-- p>たださぁ、動かなくなっちゃったの見付けたなら、便所の落書きやmixiのコミュニティトピなんかに書き込むんじゃなくって、mailで作者に言えよなぁおまいら、という感じです。作者だって、毎日こんなの使ってるわけではないのです。</p -->
 
-  <p>初めて直接要望がありました。取り敢えず、まず「1.02」にしました(2/9/2014)。「列車種別の変換を抑制するオプション」は、難しいです。というのも、「列車種別」は任意文字列ではなく、dia fileの冒頭で全種類列挙しておく必要があるからです。「快速急行」の他、変換して欲しい列車種別を挙げて下さい(私鉄には列車種別が多すぎて、私が調査する気にはなりません)。もしくは、任意文字列を書けるような仕様にするようOuDiaの作者に働きかけて下さい(dia fileが大幅に変わってしまいそうですが)。それからついでに、「鹿児島本線で運転日注意の休日運休列車も変換されてしまう」のは、具体的にはよくわかりませんが、そもそもえきから時刻表の休日ページに休日運休列車が掲載されている方がおかしいんじゃないんですか?(2/23/2014)</p>
+  <!-- <p>初めて直接要望がありました。取り敢えず、まず「1.02」にしました(2/9/2014)。「列車種別の変換を抑制するオプション」は、難しいです。というのも、「列車種別」は任意文字列ではなく、dia fileの冒頭で全種類列挙しておく必要があるからです。「快速急行」の他、変換して欲しい列車種別を挙げて下さい(私鉄には列車種別が多すぎて、私が調査する気にはなりません)。もしくは、任意文字列を書けるような仕様にするようOuDiaの作者に働きかけて下さい(dia fileが大幅に変わってしまいそうですが)。それからついでに、「鹿児島本線で運転日注意の休日運休列車も変換されてしまう」のは、具体的にはよくわかりませんが、そもそもえきから時刻表の休日ページに休日運休列車が掲載されている方がおかしいんじゃないんですか?(2/23/2014)</p> -->
 
   <h3>これは何?</h3>
   <p>『<a href="http://ekikara.jp/">えきから時刻表</a>』のdataを、<a href="http://homepage2.nifty.com/take-okm/oudia/">OuDia</a>形式のfileに変換するJava programとその<!-- cgi wrapper -->jaxrs programです。</p>
@@ -87,7 +104,7 @@
   <p>確かに、2007年度開始時に『えきから時刻表』のformatが変わり、一時的に使えなくなる、ということがありました。が、よく観察すると大した変更ではなく、parseするtableを一段ずらすだけの変更で間に合いました。『えきから時刻表』は、mash up出来るように賢く出来てはいないので、追随するのは躊躇われるかもしれませんけれども、その欠点を補って余りある便利さだと感じています。上下700本以上ある山手線(1301041)のダイヤも、一発で出来てしまいます。</p>
   <!-- えきから、2008.10.19にminor version upしくさった。何も告知なしで。一瞬、うち用対策かと焦ったが、なので一応user agentはlibwww-perlをよすようにしたが、そうではなかったっぽい。鹿児島本線新八代や七尾線和倉温泉の「発・発」というbugが直ってたし、バルーンさがも「(0959)」とか括弧つきで時刻入ってたし、少しだけ改良した模様。でもおかげで、「down1.htm」から「down1_1.htm」とURLも無駄に変わってたし、「更新日」の位置がぶれる(違うtrにある場合がある)ようになってた。ともあれ、cgiのlevelとJavaのlevelの両方で、動かなくなってた。 -->
 
-  <h3><a href="http://walt.dix.asia/~u-ryo/java/ekikara2oud/ekikara2oudia-1.2.8.tar.bz2">source code</a></h3>
+  <h3><a href="ekikara2oudia-1.2.9.tar.bz2">source code</a></h3>
   <p>このconverterはJava(ver. 1.7以上)で作られています。maven2でbuildして下さい。</p>
 
   <h3>Acknowledgement</h3>
@@ -96,14 +113,14 @@
 
 
   <h3>自分で動かすには</h3>
-  <p><a href="http://jericho.htmlparser.net/">jericho-html</a>と<a href="http://commons.apache.org/logging/">commons-logging</a>を、それぞれ「jericho-html.jar」と「commons-logging.jar」という名前にして、ekikara2oudia-1.2.8.jarと同じdirectoryに置いて下さい。引数には、えきから時刻表のURLを取ります。実行はcommand lineにて、例えば、以下のように打ちます。</p>
-  <blockquote><kbd>java -Dfile.encoding=sjis [-DprocessTables=1] [-DKitenJikoku=300] -jar ekikara2oudia-1.2.8.jar http://ekikara.jp/newdata/line/2701241/down1_1_holi.htm http://ekikara.jp/newdata/line/2701241/up1_1_holi.htm</kbd></blockquote>
+  <p><!-- <a href="http://jericho.htmlparser.net/">jericho-html</a>と<a href="http://commons.apache.org/logging/">commons-logging</a>を、それぞれ「jericho-html.jar」と「commons-logging.jar」という名前にして、ekikara2oudia-1.2.8.jarと同じdirectoryに置いて下さい。 -->引数には、えきから時刻表のURLを取ります。実行はcommand lineにて、例えば、以下のように打ちます。</p>
+  <blockquote><kbd>java -Dfile.encoding=sjis [-DprocessTables=1] [-DKitenJikoku=300] -jar ekikara2oudia-1.2.9.one-jar.jar http://ekikara.jp/newdata/line/2701241/down1_1_holi.htm http://ekikara.jp/newdata/line/2701241/up1_1_holi.htm</kbd></blockquote>
   <p>maven2でのbuildの仕方は、<a href="http://www.nulab.co.jp/kousei/chapter4/01.html">Maven2によるビルド入門</a>等で勉強して下さい(こういう説明をするのが面倒だったので、web applicationにしたのです)。</p>
 
 
   <hr/>
   <address><a href="mailto:u-ryo＠walt.dix.asia">Ryo UMETSU</a>(since 2008.2.8)</address>
-  <!-- hhmts start -->Last modified: Thu Feb 14 00:03:48 JST 2014 <!-- hhmts end -->
+  <!-- hhmts start -->Last modified: Thu Dec 14 01:51:37 JST 2014 <!-- hhmts end -->
 
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
