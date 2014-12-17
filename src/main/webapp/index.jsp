@@ -11,7 +11,7 @@
    .line_number { color:red; }
    .important { color:red; font-style:italic; }
    .underline { text-decoration: underline; }
-   .textfield { width:60px; }
+   .textfield { width:68px; }
   </style>
  </head>
 
