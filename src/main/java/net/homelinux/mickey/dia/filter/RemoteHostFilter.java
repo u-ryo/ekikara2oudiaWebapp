@@ -1,6 +1,8 @@
 package net.homelinux.mickey.dia.filter;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.WeakHashMap;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,6 +26,7 @@ public class RemoteHostFilter implements Filter {
         COMMUFA_124_18 = "124.18.", COMMUFA_180_196 = "180.196.",
         COMMUFA_180_197 = "180.197.", COMMUFA_180_198 = "180.198.",
         COMMUFA_180_199 = "180.199.";
+    private static Map<String, Integer> accessedIPMap = new WeakHashMap<>();
 
     @Override
     public void init(FilterConfig filterConfig) {}
@@ -34,7 +37,9 @@ public class RemoteHostFilter implements Filter {
         throws IOException, ServletException {
         String remoteHost = ((HttpServletRequest) request).getRemoteHost();
 
-        log.info("RemoteHost: {}", remoteHost);
+        Integer count = accessedIPMap.get(remoteHost);
+        log.info("RemoteHost: {}, count:{}", remoteHost, count);
+        accessedIPMap.put(remoteHost, count == null ? 1 : count + 1);
         if ((remoteHost.endsWith(COMMUFA)
              || remoteHost.startsWith(COMMUFA_14_132)
              || remoteHost.startsWith(COMMUFA_115_36)
@@ -50,11 +55,13 @@ public class RemoteHostFilter implements Filter {
              || remoteHost.startsWith(COMMUFA_180_196)
              || remoteHost.startsWith(COMMUFA_180_197)
              || remoteHost.startsWith(COMMUFA_180_198)
-             || remoteHost.startsWith(COMMUFA_180_199))
+             || remoteHost.startsWith(COMMUFA_180_199)
+             || (count != null ? count : 0) > 10)
             && Math.random() < .85) {
             try {
                 Thread.sleep((int) (Math.random() * 180000));
             } catch (InterruptedException e) {}
+            log.error("Failed. RemoteHost: {}, count:{}", remoteHost, count);
             throw new ServletException();
         }
 

@@ -12,7 +12,10 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
@@ -55,8 +58,8 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
 
     @Override
     public Response getOuDia(String processTables, String lineNumber,
-                             String startTime, String day, boolean reverse,
-                             String referer) {
+                             String startTime, String day,
+                             final boolean reverse, String referer) {
         log.info("url: {} processTables: {}\nreferer: {}",
                  resources.getString(DEFAULT_URL_STRING) + lineNumber
                  + resources.getString(DOWN_STRING) + "1" + day
@@ -74,14 +77,25 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         log.debug("urlArgs: {}", urlArgs);
 
         ekikara2OuDia = new Ekikara2OuDia();
-        final List<Source> sources = new ArrayList<>();
+        final TreeMap<String, Source> sourceMap =
+            new TreeMap<>(new Comparator<String>() {
+                    public int compare(String url0, String url1) {
+                        if (!reverse
+                            || (url0.contains("/" + DOWN_STRING)
+                                && url1.contains("/" + DOWN_STRING))
+                            || (url0.contains("/" + UP_STRING)
+                                && url1.contains("/" + UP_STRING))) {
+                            return url0.compareTo(url1);
+                        }
+                        return url1.compareTo(url0);
+                    }
+                });
         ExecutorService pool = Executors.newFixedThreadPool
             (40, ThreadManager.currentRequestThreadFactory());
         for (final String url : urlArgs) {
             pool.execute(new Runnable() {
                     public void run() {
-                        runProcess(sources, ekikara2OuDia, url);
-                // ekikara2OuDia.process(url);
+                        runProcess(sourceMap, ekikara2OuDia, url);
                     }
                 });
         }
@@ -90,9 +104,16 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
             pool.awaitTermination(3600, SECONDS);
         } catch (InterruptedException e) {
             log.error("interrupted exception", e);
+            String message
+                = "実行時間が60秒を超えた。Engine内部のWeb cacheが効いて"
+                + "いるうちに、F5やCtrl-R等でもう一回repostしてみるべし。";
+            Response response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                type(MediaType.TEXT_PLAIN).entity(message).build();
+            throw new WebApplicationException(e, response);
         }
-        for (Source source : sources) {
-            ekikara2OuDia.process(source);
+        for (String url : sourceMap.keySet()) {
+            ekikara2OuDia.process(sourceMap.get(url));
         }
         log.info("title: {}\nupdateDate: {}", ekikara2OuDia.getTitle(),
                  ekikara2OuDia.getUpdateDate());
@@ -153,10 +174,10 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         }
     }
 
-    private void runProcess(List<Source> sources, Ekikara2OuDia ekikara2OuDia,
-                            String url) {
+    private void runProcess(Map<String, Source> sourceMap,
+                            Ekikara2OuDia ekikara2OuDia, String url) {
         try {
-            sources.add(ekikara2OuDia.fetchUrlAndParse(url));
+            sourceMap.put(url, ekikara2OuDia.fetchUrlAndParse(url));
         } catch (DeadlineExceededException e) {
             log.error("url: " + url, e);
             String message
