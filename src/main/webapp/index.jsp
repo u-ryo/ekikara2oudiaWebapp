@@ -18,6 +18,7 @@
  <body>
   <h1>えきから to OuDia</h1>
 
+    <!-- <form action="http://walt.dix.asia:9192/jaxrs/ekikara2oudia/getOuDia" method="post"> -->
     <form action="jaxrs/ekikara2oudia/getOuDia" method="post">
       線区番号: <input class="textfield" type="text" name="lineNumber" maxlength="7" value='<%=request.getParameter("lineNumber") == null ? "" : request.getParameter("lineNumber")%>'>
       曜日: <select name="day">
@@ -32,6 +33,9 @@
     </form>
 
   <p>
+    幾人かの方、errorのご指摘ありがとうございました。原因究明中です。手元では動くので、GAEの問題なんですが... 取り敢えずうちのserverのを提供します。(2015.1.31) → 何か、動いてるようなので、GAE上のもので再開します。(2015.2.4)
+  </p>
+  <p>
     京急本線のような大規模な路線については、60秒のtimeout制限を越えてしまうことがあるようです。失敗した後、30秒以内に同じ条件で再試行すれば、cacheが効いて成功するようです。(2014.12.16) → multithread化しました。少しは改善したようです。(2014.12.16)
   </p>
   <p>
@@ -42,7 +46,7 @@
     <!-- <a href="http://mickey.homelinux.net/~u-ryo/java/ekikara2oud/index.html">旧版</a>を用意しました。もしどうしてもうまく動かない場合には、旧版を使って下さい。 -->
     <!-- 但し、2012年4月下旬に一旦止まる予定です。-->
   </p>
-  <p>GAEでは、毎日JSTで16:00にquota resetされます。</p>
+  <p>GAEでは、毎日JSTで17:00にquota resetされます。</p>
   <p>Bookmarklet:
     <a id="result_anchor" href="javascript:(function(){var lineNumber=location.href.replace(/http:\/\/ekikara.jp\/newdata\/[a-z]+\/(\d+)[/.].*/,'$1');if(isNaN(lineNumber)){alert('Here is not ekikara.jp.');}else{location.href='https://ekikara2oudia.appspot.com/?lineNumber='+lineNumber;}})();">Go to Ekikara2OuDia</a>
     <!-- <a id="result_anchor" href="javascript:(function(){var lineNumber=location.href.replace(/http:\/\/ekikara.jp\/newdata\/[a-z]+\/(\d+)[/.].*/,'$1');if(isNaN(lineNumber)){alert('Here is not ekikara.jp.');return;}var args='lineNumber='+lineNumber+'&day=&processTables=1&startTime=0400';var xmlHttpRequest=new XMLHttpRequest();xmlHttpRequest.onreadystatechange=function(){var READYSTATE_COMPLETED=4;var HTTP_STATUS_OK=200;if(this.readyState==READYSTATE_COMPLETED&&this.status==HTTP_STATUS_OK){location.href='data:application/octet-stream,'+encodeURIComponent(this.responseText);}};xmlHttpRequest.open('POST','https://ekikara2oudia.appspot.com/jaxrs/ekikara2oudia/getOuDia');xmlHttpRequest.setRequestHeader('Content-Type','application/x-www-form-urlencoded');xmlHttpRequest.send(args);})();">Create OuDia Weekday</a> -->
