@@ -27,7 +27,6 @@
  <body>
   <h1>えきから to OuDia</h1>
 
-    <!-- <form action="http://walt.dix.asia:9192/jaxrs/ekikara2oudia/getOuDia" method="post"> -->
     <form action="jaxrs/ekikara2oudia/getOuDia" method="post">
       線区番号: <input class="textfield" type="text" name="lineNumber" maxlength="7" value='<%=request.getParameter("lineNumber") == null || !request.getParameter("lineNumber").matches("\\d{7}") ? "" : request.getParameter("lineNumber")%>'>
       曜日: <select name="day">
@@ -41,20 +40,27 @@
       <input type="submit">
     </form>
 
+  <h3>What's new</h3>
+  <ul>
+    <li>
+      えきから時刻表、偕楽園設置時の常磐線は上下線で駅数が違うために、エラーになったり上り列車が1駅ずれたりするので、改良しました。知らせて下さった方、ありがとうございます。<!-- ただ、当然ですが常磐線上り列車は全て偕楽園を通過(平日は下り列車も全て通過)するので、OuDiaでは上り列車が水戸〜赤塚で直立します(<a href="http://kamelong.web.fc2.com/aodia/">AOdia</a>では大丈夫です)。 -->(2017.2.18)<br/>
+      (その他、もう作って10年にもなるのに今更ながらUnit Testを追加したりしました)
+      (どうも<a href="https://ekikara2oudia.appspot.com/">GAEの方</a>は、一部ページの取得に失敗しやすいようです。<a href="https://ekikara2oudia.herokuapp.com/">heroku版</a>を使って下さい。→一部のページの取得に失敗したらエラーにするようにしました)
+    </li>
+    <li>
+      今更ですが、<a href="http://heroku.com/">heroku</a>を使うことにしました。
+      今後は<a href="https://ekikara2oudia.herokuapp.com/">heroku版</a>をmaintenanceしようと思います。
+      (2015.11.15)<br/>
+      (herokuはGAEより短い30秒制限があるので躊躇ってたんですが、
+      GAEだとJava8が使えませんし[Compute Engineは有料]、その他のresources制限が厳しいですし、
+      他方herokuを試してみたら京急本線70ファイル取得でも20秒で終わるので
+      [去年並列化したのが効いたようです]、
+      移行することにしました)
+    </li>
+  </ul>
+
+  <h3>Bookmarklet:</h3>
   <p>
-    今更ですが、<a href="http://heroku.com/">heroku</a>を使うことにしました。
-    今後は<a href="https://ekikara2oudia.herokuapp.com/">heroku版</a>をmaintenanceしようと思います。
-    (2015.11.15)
-  </p>
-  <p>
-    (herokuはGAEより短い30秒制限があるので躊躇ってたんですが、
-    GAEだとJava8が使えませんし[Compute Engineは有料]、その他のresources制限が厳しいですし、
-    他方herokuを試してみたら京急本線70ファイル取得でも20秒で終わるので
-    [去年並列化したのが効いたようです]、
-    移行することにしました。
-    あーでも、herokuは一日18時間しか動かせないという話もあるので、様子見ます)
-  </p>
-  <p>Bookmarklet:
     <a id="result_anchor" href="javascript:(function(){var lineNumber=location.href.replace(/http:\/\/ekikara.jp\/newdata\/[a-z]+\/(\d+)[/.].*/,'$1');if(isNaN(lineNumber)){alert('Here is not ekikara.jp.');}else{location.href='https://ekikara2oudia.herokuapp.com/?lineNumber='+lineNumber;}})();">Go to Ekikara2OuDia</a>
     (えきから時刻表の「線区番号」が出ているページ、即ち「路線時刻表」「路線沿線(駅名)」「列車詳細」で有効です)
   </p>
@@ -102,12 +108,12 @@
 
   <h3>自分で動かすには</h3>
   <p>引数には、えきから時刻表のURLを取ります。実行はcommand lineにて、例えば、以下のように打ちます。</p>
-  <blockquote><kbd>java -Dfile.encoding=sjis [-DprocessTables=1] [-DKitenJikoku=300] -jar ekikara2oudia-1.2.9.one-jar.jar http://ekikara.jp/newdata/line/2701241/down1_1_holi.htm http://ekikara.jp/newdata/line/2701241/up1_1_holi.htm</kbd></blockquote>
-  <p>mavenでのbuildの仕方は、net等で勉強して下さい(こういう説明をするのが面倒だったので、web applicationにしたのです)。</p>
+  <blockquote><kbd>java -Dfile.encoding=sjis [-DprocessTables=1] [-DKitenJikoku=300] -jar ekikara2oudia-1.2.10.one-jar.jar http://ekikara.jp/newdata/line/2701241/down1_1_holi.htm http://ekikara.jp/newdata/line/2701241/up1_1_holi.htm</kbd></blockquote>
+  <p>maven3でのbuildの仕方は、net等で勉強して下さい(こういう説明をするのが面倒だったので、web applicationにしたのです)。</p>
 
   <hr/>
   <address><a href="mailto:u-ryo＠walt.mydns.bz">Ryo UMETSU</a>(since 2008.2.8)</address>
-  <!-- hhmts start -->Last modified: Thu Nov 15 20:58:37 JST 2015 <!-- hhmts end -->
+  <!-- hhmts start -->Last modified: Sat Feb 18 21:16:53 JST 2017 <!-- hhmts end -->
 
  </body>
 </html>

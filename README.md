@@ -1,7 +1,7 @@
 # ekikara2oudiaWebapp
 A web application for ekikara2oudia on GAE
 
-You can see it on [GAE](https://ekikara2oudia.appspot.com/ "Ekikara2OuDia on GAE").
+You can see it on [GAE](https://ekikara2oudia.appspot.com/ "Ekikara2OuDia on GAE") and [Heroku](https://ekikara2oudia.heroku.com/ "Ekikara2OuDia on Heroku").
 
 ### Starting a local test server
 ```

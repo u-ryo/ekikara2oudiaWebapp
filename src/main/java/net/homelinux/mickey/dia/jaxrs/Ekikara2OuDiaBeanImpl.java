@@ -90,12 +90,28 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                         return url1.compareTo(url0);
                     }
                 });
-        ExecutorService pool = Executors.newFixedThreadPool
-            (40, ThreadManager.currentRequestThreadFactory());
+        
+        ExecutorService pool = Executors.newCachedThreadPool();
+        try {
+            pool = Executors.newFixedThreadPool
+                (40, ThreadManager.currentRequestThreadFactory());
+        } catch (NullPointerException e) {}
+        final List<WebApplicationException> exceptions = new ArrayList<>();
+        // Thread.currentThread().setUncaughtExceptionHandler
+        //     (new Thread.UncaughtExceptionHandler() {
+        //             public void uncaughtException(Thread t, Throwable e) {
+        //                 exceptions.add(e);
+        //             }
+        //         });
         for (final String url : urlArgs) {
             pool.execute(new Runnable() {
+                    @Override
                     public void run() {
-                        runProcess(sourceMap, ekikara2OuDia, url);
+                        try {
+                            runProcess(sourceMap, ekikara2OuDia, url);
+                        } catch (WebApplicationException e) {
+                            exceptions.add(e);
+                        }
                     }
                 });
         }
@@ -105,15 +121,22 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         } catch (InterruptedException e) {
             log.error("interrupted exception", e);
             String message
-                = "実行時間が60秒を超えた。Engine内部のWeb cacheが効いて"
-                + "いるうちに、F5やCtrl-R等でもう一回repostしてみるべし。";
+                = "Excection time was over 60 seconds.\n"
+                + "Retry to reload (F5/Ctrl-R) a few times.\n" + e;
             Response response =
                 Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 type(MediaType.TEXT_PLAIN).entity(message).build();
             throw new WebApplicationException(e, response);
         }
+        log.debug("exceptions:{}", exceptions);
+        if (!exceptions.isEmpty()) {
+            throw exceptions.get(0);
+        }
         for (String url : sourceMap.keySet()) {
             ekikara2OuDia.process(sourceMap.get(url));
+        }
+        if (ekikara2OuDia.rule != null) {
+            ekikara2OuDia.adjust();
         }
         log.info("title: {}\nupdateDate: {}", ekikara2OuDia.getTitle(),
                  ekikara2OuDia.getUpdateDate());
@@ -123,7 +146,8 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                                ekikara2OuDia.getAllStations(),
                                ekikara2OuDia.getDownTrains(),
                                ekikara2OuDia.getUpTrains(),
-                               urlArgs + " " + ekikara2OuDia.getUpdateDate());
+                               urlArgs.toString().replaceAll(",", "") + " "
+                               + ekikara2OuDia.getUpdateDate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         OutputStreamWriter writer = null;
         try {
@@ -155,13 +179,13 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
                              String startTime, String day) {
         String message = null;
         if (!processTables.matches(PROCESS_TABLES_PATTERN_STRING)) {
-            message = "「処理する表」の指定がまずい.";
+            message = "Bad Shorisuru-Hyo.";
         } else if (!lineNumber.matches(LINE_NUMBER_PATTERN_STRING)) {
-            message = "線区番号が悪い.";
+            message = "Bad Senku-Bango.";
         } else if (!startTime.matches(START_TIME_PATTERN_STRING)) {
-            message = "起点時刻の指定が悪い.";
+            message = "Bad Kiten-Jikoku.";
         } else if (!day.matches(DAY_PATTERN_STRING)) {
-            message = "曜日の指定が悪い.";
+            message = "Bad Youbi-no-Shitei.";
         }
         if (message != null) {
             log.error("checkParams error! {}\nprocessTables: {}\nlineNumber: "
@@ -181,9 +205,9 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         } catch (DeadlineExceededException e) {
             log.error("url: " + url, e);
             String message
-                = "実行時間が60秒を超えた。Engine内部のWeb cacheが効いて"
-                + "いるうちに、F5やCtrl-R等でもう一回repostしてみるべし。"
-                + "2〜3回やってもダメなら、mailで相談されたい。";
+                = "Execution time was over 60 seconds. "
+                + "Retry to reload (F5/Ctrl-R) some times. "
+                + "If you fail again and again, consult me by e-mail.\n" + e;
             Response response =
                 Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 type(MediaType.TEXT_PLAIN).entity(message).build();
@@ -191,8 +215,18 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
         } catch (IndexOutOfBoundsException e) {
             log.error("url: " + url, e);
             String message
-                = "多分「処理する表」の指定が範囲外、"
-                + "そうでなければinternalなerror(not yet resolved)。" + e;
+                = "Maybe your Shorisuru-Hyo is out of bounds or "
+                + "some internal error(not yet resolved).\n" + e;
+            Response response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                type(MediaType.TEXT_PLAIN).entity(message).build();
+            throw new WebApplicationException(e, response);
+        } catch (SocketTimeoutException e) {
+            log.error("url: " + url, e);
+            String message
+                = "Could not get " + url
+                + "\nRetry to reload this request.\n"
+                + "If you fail again and again, consult me by e-mail.\n" + e;
             Response response =
                 Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 type(MediaType.TEXT_PLAIN).entity(message).build();
@@ -229,21 +263,28 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
             Response response =
                 Response.status(Response.Status.NOT_FOUND).
                 type(MediaType.TEXT_PLAIN).
-                entity("指定された線区番号は見付からなかった.").build();
+                entity("Could not find Senku-Bango you specified.\n" + e).build();
+            throw new WebApplicationException(e, response);
+        } catch (SocketTimeoutException e) {
+            log.error("defaultURL: " + defaultURL, e);
+            Response response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+                type(MediaType.TEXT_PLAIN).
+                entity("Could not get " + defaultURL + "\n" + e).build();
             throw new WebApplicationException(e, response);
         } catch (IOException e) {
             log.error("defaultURL: " + defaultURL, e);
             Response response =
                 Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 type(MediaType.TEXT_PLAIN).
-                entity("server側のIO error.").build();
+                entity("IOError by server.\n" + e).build();
             throw new WebApplicationException(e, response);
         } catch (ApiProxy.OverQuotaException e) {
             log.error("defaultURL: " + defaultURL, e);
             Response response =
                 Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                 type(MediaType.TEXT_PLAIN).
-                entity("fetch URLでGAEのQuotaを超えた。").build();
+                entity("Exceeded GAE Quota.\n" + e).build();
             throw new WebApplicationException(e, response);
         }
 
@@ -253,7 +294,7 @@ public class Ekikara2OuDiaBeanImpl implements Ekikara2OuDiaBean {
             Response response =
                 Response.status(Response.Status.BAD_REQUEST).
                 type(MediaType.TEXT_PLAIN).
-                entity("指定の線区番号がおかしいと思われ.").build();
+                entity("Maybe bad Senku-Bango.").build();
             throw new WebApplicationException(response);
         }
         return pages;
