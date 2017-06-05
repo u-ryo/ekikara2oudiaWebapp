@@ -3,7 +3,7 @@ $ JAVA_HOME=/usr/lib/jvm/java-7-oracle mvn clean deploy
 $ cd ~/tmp/Ekikara2OuDiaWebApp
 
 https://code.google.com/p/appengine-maven-plugin/
-mvn clean appengine:devserver
+JAVA_HOME=/usr/lib/jvm/java-7-oracle mvn clean appengine:devserver
 rm ~/.appcfg_oauth2_tokens_java
 JAVA_HOME=/usr/lib/jvm/java-7-oracle mvn clean appengine:update
 
@@ -12,3 +12,7 @@ JAVA_HOME=/usr/lib/jvm/java-8-oracle mvn clean heroku:deploy-war
 or
 heroku plugins:install heroku-cli-deploy
 heroku deploy:war --war target/ekikara2oudia-1.0.2.war --app ekikara2oudia
+
+
+git push https://github.com/u-ryo/ekikara2oudia.git
+git push https://github.com/u-ryo/ekikara2oudiaWebapp.git

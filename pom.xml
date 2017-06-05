@@ -10,7 +10,7 @@
   <properties>
     <gae.version>1.9.49</gae.version>
     <cxf.version>[2,)</cxf.version>
-    <slf4j.version>[1.7,)</slf4j.version>
+    <slf4j.version>1.7.25</slf4j.version>
   </properties>
   <dependencies>
     <dependency>
